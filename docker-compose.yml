@@ -1,0 +1,43 @@
+version: "3.9"
+    
+services:
+  db:
+    image: bitnami/mysql:8.0
+    volumes:
+      - swbeef_data:/bitnami/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USR}
+      MYSQL_PASSWORD: ${MYSQL_PW}
+    
+  wordpress:
+    depends_on:
+      - db
+    image: bitnami/wordpress:5.9.3
+    volumes:
+      - wp_data:/bitnami/wordpress
+      - ./output:/output
+
+    ports:
+      - '8001:8081'
+      - '4433:8443'
+    restart: always
+    environment:
+      APACHE_HTTP_PORT_NUMBER: ${WPPORT}
+      WORDPRESS_DATABASE_HOST: ${WP_DB_HOST}
+      WORDPRESS_DATABASE_USER: ${WP_DB_USR}
+      WORDPRESS_DATABASE_PASSWORD: ${WP_DB_PW}
+      WORDPRESS_DATABASE_NAME: ${WP_DB_NAME}
+
+  adminer:
+    image: adminer:4
+    ports:
+      - 8090:8080
+    environment:  
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT}
+
+volumes:
+  swbeef_data: {}
+  wp_data: {}
